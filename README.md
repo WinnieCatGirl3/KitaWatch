@@ -128,15 +128,24 @@ adb install src-tauri\gen\android\app\build\outputs\apk\arm64\debug\app-arm64-de
 ```
 
 On Windows the Tauri CLI symlinks the Rust library into `jniLibs`, which needs
-Developer Mode (or an elevated shell). Without it, copy the library and drive
-Gradle directly:
+Developer Mode (or an elevated shell). Without it, build the library yourself
+and drive Gradle directly:
 
 ```powershell
-Copy-Item src-tauri\target\aarch64-linux-android\debug\libkitawatch_lib.so `
-    src-tauri\gen\android\app\src\main\jniLibs\arm64-v8a\
-Set-Location src-tauri\gen\android
+Set-Location src-tauri
+cargo build --target aarch64-linux-android --features tauri/custom-protocol
+Copy-Item target\aarch64-linux-android\debug\libkitawatch_lib.so `
+    gen\android\app\src\main\jniLibs\arm64-v8a\
+Set-Location gen\android
 .\gradlew.bat :app:assembleArm64Debug -x rustBuildArm64Debug
 ```
+
+`--features tauri/custom-protocol` is what the Tauri CLI passes for every
+non-dev build: without it `tauri-build` reports `dev` and the embedded
+WebView loads `devUrl` (`http://localhost:1420`) instead of the bundled
+`dist/` assets — the app then shows a network error page. Run
+`npm run build` first (or at least whenever `src/` changed): the frontend is
+compiled into `libkitawatch_lib.so`, not into the APK's `assets/`.
 
 ## Supabase guest accounts and CAPTCHA
 
