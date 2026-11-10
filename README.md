@@ -110,6 +110,34 @@ Shipping a release:
 npm run release:tag -- X.Y.Z   # bump, commit, tag, push -> CI builds + signs + publishes
 ```
 
+### Android (experimental)
+
+The Android build embeds Python (Chaquopy) and runs the Kuhi API in-process on
+`127.0.0.1:8000` instead of spawning sidecars; the desktop and Linux/Windows
+builds are unaffected. arm64-v8a only — `curl_cffi` ships no other Android
+wheels and Python 3.12+ is 64-bit only.
+
+Prerequisites: Android SDK + NDK, JDK 17+, Rust Android target, and
+`npm run setup:api` (the build copies `api/anime-api/` into the Python source
+set). The project lives in `src-tauri/gen/android` and is committed, so
+`tauri android init` is only needed to regenerate it from scratch.
+
+```bash
+npm run tauri android build --debug --target aarch64
+adb install src-tauri\gen\android\app\build\outputs\apk\arm64\debug\app-arm64-debug.apk
+```
+
+On Windows the Tauri CLI symlinks the Rust library into `jniLibs`, which needs
+Developer Mode (or an elevated shell). Without it, copy the library and drive
+Gradle directly:
+
+```powershell
+Copy-Item src-tauri\target\aarch64-linux-android\debug\libkitawatch_lib.so `
+    src-tauri\gen\android\app\src\main\jniLibs\arm64-v8a\
+Set-Location src-tauri\gen\android
+.\gradlew.bat :app:assembleArm64Debug -x rustBuildArm64Debug
+```
+
 ## Supabase guest accounts and CAPTCHA
 
 The leaderboard can create a private anonymous Supabase account for a device that
