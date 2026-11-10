@@ -76,6 +76,11 @@ interface SettingsState {
   /** Preferred source provider for each audio mode; empty means automatic. */
   preferredSubProvider: string;
   preferredDubProvider: string;
+  /**
+   * Bundled Kuhi API (search, info, spotlight, filter, episodes, extract).
+   * Loopback only — on Android the same service is embedded via Chaquopy.
+   */
+  apiBaseUrl: string;
   consumetBaseUrl: string;
   enableConsumetFallback: boolean;
   /** Local proxy sidecar (CORS + referer + m3u8 rewrite). */
@@ -124,6 +129,7 @@ interface SettingsState {
   setProviderPriority: (order: string[]) => void;
   setPreferredSubProvider: (provider: string) => void;
   setPreferredDubProvider: (provider: string) => void;
+  setApiBaseUrl: (url: string) => void;
   setConsumetBaseUrl: (url: string) => void;
   setEnableConsumetFallback: (v: boolean) => void;
   setProxyBaseUrl: (url: string) => void;
@@ -154,6 +160,8 @@ export const useSettingsStore = create<SettingsState>()(
       providerPriority: [...PROVIDER_PRIORITY],
       preferredSubProvider: '',
       preferredDubProvider: '',
+      // Bundled Kuhi API — always loopback (sidecarDefault rejects anything else).
+      apiBaseUrl: sidecarDefault(import.meta.env.VITE_API_BASE_URL, 'http://127.0.0.1:8000'),
       // Consumet is user-self-hostable (docker) and NOT bundled with the app,
       // so the fallback is opt-in — enabling it without a local instance
       // just adds a guaranteed connection-refused to every episode.
@@ -191,6 +199,7 @@ export const useSettingsStore = create<SettingsState>()(
       setProviderPriority: (providerPriority) => set({ providerPriority }),
       setPreferredSubProvider: (preferredSubProvider) => set({ preferredSubProvider }),
       setPreferredDubProvider: (preferredDubProvider) => set({ preferredDubProvider }),
+      setApiBaseUrl: (apiBaseUrl) => set({ apiBaseUrl }),
       setConsumetBaseUrl: (consumetBaseUrl) => set({ consumetBaseUrl }),
       setEnableConsumetFallback: (enableConsumetFallback) =>
         set({ enableConsumetFallback }),

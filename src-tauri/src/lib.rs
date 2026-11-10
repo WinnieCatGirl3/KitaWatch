@@ -1,7 +1,15 @@
+// Sidecar helpers are mostly desktop-only (mobile embeds the Python services
+// via Chaquopy instead of spawning bundled binaries); the log/config helpers
+// stay available on every platform.
+#[cfg_attr(not(desktop), allow(dead_code))]
 mod api_sidecar;
 mod commands;
 mod config;
+#[cfg(desktop)]
 mod discord;
+// On mobile the sidecar spawn path is compiled out (no bundled binaries
+// there), so most of these helpers are only referenced from desktop code.
+#[cfg_attr(not(desktop), allow(dead_code))]
 mod proc_group;
 use tauri::Manager;
 
@@ -45,16 +53,26 @@ pub fn run() {
     builder = builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_window_state::Builder::default().build())
-        .invoke_handler(tauri::generate_handler![
-            commands::exchange_anilist_token,
-            commands::download_episode,
-            commands::collect_debug_report,
-            commands::discord_presence_set,
-            commands::discord_presence_clear,
-        ]);
+        .plugin(tauri_plugin_shell::init());
+
+    // Desktop-only: mobile builds get updates from the app store instead of
+    // the GitHub-Releases updater, and there is no window geometry to persist
+    // on Android (tauri-plugin-window-state even compiles to an empty crate
+    // there, so referencing it on mobile would not build).
+    #[cfg(desktop)]
+    {
+        builder = builder
+            .plugin(tauri_plugin_updater::Builder::new().build())
+            .plugin(tauri_plugin_window_state::Builder::default().build());
+    }
+
+    builder = builder.invoke_handler(tauri::generate_handler![
+        commands::exchange_anilist_token,
+        commands::download_episode,
+        commands::collect_debug_report,
+        commands::discord_presence_set,
+        commands::discord_presence_clear,
+    ]);
 
     builder
         .setup(|app| {
@@ -66,10 +84,17 @@ pub fn run() {
             }
             // Discord IPC can take time to connect when Discord is closed. Keep it
             // off the native setup path so it cannot delay the first app window.
+            #[cfg(desktop)]
             std::thread::spawn(|| {
                 crate::discord::init("1553307716758536202");
             });
 
+            // Desktop: (re-)register the schemes at runtime, covering installs
+            // where the OS registration is missing (e.g. a bare AppImage).
+            // Mobile has no register_all() at all — schemes are registered at
+            // build time from the config, and the plugin's mobile impl only
+            // exposes get_current() plus the new-url events.
+            #[cfg(desktop)]
             {
                 use tauri_plugin_deep_link::DeepLinkExt;
                 match app.deep_link().register_all() {
@@ -94,22 +119,28 @@ pub fn run() {
             });
             app.manage(sidecar_state);
 
-            let sidecar_app = app.handle().clone();
-            std::thread::spawn(move || {
-                let mut sidecars = api_sidecar::start(&sidecar_app);
-                if let Some(state) = sidecar_app.try_state::<std::sync::Mutex<SidecarLifecycle>>() {
-                    match state.lock() {
-                        Ok(mut state) if !state.shutting_down => {
-                            state.sidecars = Some(sidecars);
+            // Sidecars are a desktop concept. On Android the Python services
+            // are embedded in the APK instead (Chaquopy), which is why
+            // bundle.externalBin is unset in tauri.android.conf.json.
+            #[cfg(desktop)]
+            {
+                let sidecar_app = app.handle().clone();
+                std::thread::spawn(move || {
+                    let mut sidecars = api_sidecar::start(&sidecar_app);
+                    if let Some(state) = sidecar_app.try_state::<std::sync::Mutex<SidecarLifecycle>>() {
+                        match state.lock() {
+                            Ok(mut state) if !state.shutting_down => {
+                                state.sidecars = Some(sidecars);
+                            }
+                            Ok(_) | Err(_) => {
+                                api_sidecar::stop(&mut sidecars);
+                            }
                         }
-                        Ok(_) | Err(_) => {
-                            api_sidecar::stop(&mut sidecars);
-                        }
+                    } else {
+                        api_sidecar::stop(&mut sidecars);
                     }
-                } else {
-                    api_sidecar::stop(&mut sidecars);
-                }
-            });
+                });
+            }
             Ok(())
         })
         .build(tauri::generate_context!())

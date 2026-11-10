@@ -1,0 +1,17 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Capabilities for the mobile (Android/iOS) main window. Desktop-only plugins (shell sidecars, updater) are not registered there.",
+  "windows": [
+    "main"
+  ],
+  "platforms": [
+    "android",
+    "iOS"
+  ],
+  "permissions": [
+    "core:default",
+    "opener:default",
+    "deep-link:default"
+  ]
+}

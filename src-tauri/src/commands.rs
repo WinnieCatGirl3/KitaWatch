@@ -482,14 +482,40 @@ pub async fn collect_debug_report(app: tauri::AppHandle) -> Result<String, Strin
 }
 
 // ─── Discord Rich Presence ──────────────────────────────────────────────────
+// Desktop-only: Discord's IPC socket does not exist on Android/iOS, so the
+// crate is not even linked there (see Cargo.toml). The commands stay
+// registered on every platform; on mobile they are silent no-ops.
 
+#[cfg(desktop)]
 use discord_rich_presence::{activity, DiscordIpc, DiscordIpcClient};
+#[cfg(desktop)]
 use std::sync::Mutex;
 
+#[cfg(desktop)]
 static DISCORD_CLIENT: Mutex<Option<DiscordIpcClient>> = Mutex::new(None);
 
 #[tauri::command]
 pub fn discord_presence_set(
+    app_id: String,
+    details: String,
+    state: Option<String>,
+    start_unix: Option<i64>,
+) -> Result<(), String> {
+    discord_presence_set_impl(app_id, details, state, start_unix)
+}
+
+#[cfg(not(desktop))]
+fn discord_presence_set_impl(
+    _app_id: String,
+    _details: String,
+    _state: Option<String>,
+    _start_unix: Option<i64>,
+) -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(desktop)]
+fn discord_presence_set_impl(
     app_id: String,
     details: String,
     state: Option<String>,
@@ -534,6 +560,16 @@ pub fn discord_presence_set(
 
 #[tauri::command]
 pub fn discord_presence_clear() -> Result<(), String> {
+    discord_presence_clear_impl()
+}
+
+#[cfg(not(desktop))]
+fn discord_presence_clear_impl() -> Result<(), String> {
+    Ok(())
+}
+
+#[cfg(desktop)]
+fn discord_presence_clear_impl() -> Result<(), String> {
     let mut guard = DISCORD_CLIENT.lock().map_err(|e| e.to_string())?;
     if let Some(ref mut client) = *guard {
         let _ = client.clear_activity();

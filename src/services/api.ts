@@ -12,8 +12,13 @@ import type {
   SpotlightAnime,
 } from '@/types';
 
-/** The app always talks to its own bundled sidecars. */
-const API_BASE_URL = 'http://127.0.0.1:8000';
+/** Loopback endpoint of the bundled Kuhi API (overridable per device). */
+const DEFAULT_API_BASE_URL = 'http://127.0.0.1:8000';
+
+function apiBaseUrl(): string {
+  // Read at call time so a changed setting applies without a reload.
+  return useSettingsStore.getState().apiBaseUrl || DEFAULT_API_BASE_URL;
+}
 
 const DEFAULT_TIMEOUT_MS = 12_000;
 
@@ -32,7 +37,7 @@ async function request<T>(
   params?: Record<string, string | number | boolean | undefined>,
   timeoutMs = DEFAULT_TIMEOUT_MS,
 ): Promise<T> {
-  const base = API_BASE_URL;
+  const base = apiBaseUrl();
   const url = new URL(`${base}${path}`);
   if (params) {
     for (const [key, value] of Object.entries(params)) {

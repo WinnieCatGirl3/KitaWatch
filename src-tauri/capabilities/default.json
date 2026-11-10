@@ -5,6 +5,11 @@
   "windows": [
     "main"
   ],
+  "platforms": [
+    "macOS",
+    "windows",
+    "linux"
+  ],
   "permissions": [
     "core:default",
     "opener:default",
