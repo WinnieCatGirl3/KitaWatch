@@ -11,7 +11,9 @@ import {
 } from 'lucide-react';
 import Disclaimer from '@/components/ui/Disclaimer';
 
-const navItems = [
+// Single source of truth for navigation items — rendered as the desktop
+// sidebar and, below md, as the mobile bottom bar (see BottomNav.tsx).
+export const navItems = [
   {
     to: '/',
     label: 'Home',

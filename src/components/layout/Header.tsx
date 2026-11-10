@@ -436,15 +436,19 @@ export default function Header() {
                 {viewer.name.slice(0, 2).toUpperCase()}
               </span>
             )}
-            <span className="text-xs text-zinc-300">{viewer.name}</span>
+            {/* Name only from sm up — the 360dp phone header has no room. */}
+            <span className="hidden whitespace-nowrap text-xs text-zinc-300 sm:inline">
+              {viewer.name}
+            </span>
           </Link>
         ) : (
           <Link
             to="/settings"
+            title="Login with AniList"
             className="flex items-center gap-2 rounded-full bg-ink-850 px-3 py-1.5 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
           >
             <UserRound className="h-3.5 w-3.5 text-accent-400" />
-            Login with AniList
+            <span className="hidden whitespace-nowrap sm:inline">Login with AniList</span>
           </Link>
         )}
       </div>

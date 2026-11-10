@@ -2,6 +2,7 @@ import { useEffect, useState, lazy, Suspense } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { listen } from '@tauri-apps/api/event';
 import Sidebar from '@/components/layout/Sidebar';
+import BottomNav from '@/components/layout/BottomNav';
 import Header from '@/components/layout/Header';
 import ErrorBoundary from '@/components/ui/ErrorBoundary';
 import { completeLogin, isLoginPending } from '@/services/authFlow';
@@ -227,9 +228,12 @@ export default function App() {
   }, []);
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-ink-950 text-zinc-200">
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-ink-950 text-zinc-200 md:flex-row">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      {/* min-h-0: without it the column's automatic minimum size lets it grow
+          with the page content (measured 1734px in a 732px viewport on the
+          phone), pushing BottomNav below the overflow-hidden root edge. */}
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
         <Header />
         <ErrorBoundary>
           <Suspense
@@ -259,7 +263,9 @@ export default function App() {
                 className={
                   isWatchRoute
                     ? 'relative flex min-h-0 flex-1 flex-col'
-                    : 'fixed bottom-4 right-4 z-40 flex max-h-[min(460px,calc(100vh-2rem))] w-[min(420px,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl bg-ink-950 shadow-2xl ring-1 ring-white/15'
+                    // bottom-20 clears the mobile BottomNav (md:hidden) below;
+                    // md:bottom-4 restores the desktop placement.
+                    : 'fixed bottom-20 right-4 z-40 flex max-h-[min(460px,calc(100vh-2rem))] w-[min(420px,calc(100vw-2rem))] flex-col overflow-y-auto rounded-xl bg-ink-950 shadow-2xl ring-1 ring-white/15 md:bottom-4'
                 }
               >
                 <div className={isWatchRoute ? 'hidden' : 'sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-white/10 bg-ink-900 px-3 py-2'}>
@@ -289,6 +295,7 @@ export default function App() {
           )}
         </ErrorBoundary>
       </div>
+      <BottomNav />
       <WhatsNewDialog open={whatsNewOpen} appVersion={APP_VERSION} onClose={closeWhatsNew} />
       {/* Update banner */}
       {(updater.kind === 'available' || updater.kind === 'installing' || updater.kind === 'installed') && (
