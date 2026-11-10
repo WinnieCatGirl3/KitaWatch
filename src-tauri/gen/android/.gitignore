@@ -24,3 +24,5 @@ keystore.properties
 /app/src/main/python/api.py
 /app/src/main/python/src/
 /app/src/main/python/assets/
+# Output of :app:syncProxyPython (proxy/server.py copied under its package name).
+/app/src/main/python/kitawatch_proxy/

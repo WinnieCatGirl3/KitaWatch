@@ -143,14 +143,22 @@ val syncKuhiPython = tasks.register<Copy>("syncKuhiPython") {
     // the lambda would not be config-cache serializable anyway. Copying from a
     // missing directory just yields no files — run `npm run setup:api` first.
 }
+// The proxy is committed in this repo; copy it next to the other Python sources
+// under a namespaced package name (the desktop bundle runs it as server:app).
+val syncProxyPython = tasks.register<Copy>("syncProxyPython") {
+    from(rootDir.resolve("../../../proxy")) {
+        include("server.py")
+    }
+    into(layout.projectDirectory.dir("src/main/python/kitawatch_proxy"))
+}
 tasks.named("preBuild") {
-    dependsOn(syncKuhiPython)
+    dependsOn(syncKuhiPython, syncProxyPython)
 }
 // Chaquopy's per-variant source merge reads src/main/python directly, so it needs
 // the explicit edge (preBuild alone does not cover it). Configuration-time hook,
 // nothing is captured on the task itself.
 tasks.configureEach {
     if (name.startsWith("merge") && name.endsWith("PythonSources")) {
-        dependsOn(syncKuhiPython)
+        dependsOn(syncKuhiPython, syncProxyPython)
     }
 }
