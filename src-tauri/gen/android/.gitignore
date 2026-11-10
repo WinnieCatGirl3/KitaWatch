@@ -1,0 +1,26 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+key.properties
+keystore.properties
+
+/.tauri
+/tauri.settings.gradle
+
+# Output of :app:syncKuhiPython (cloned Kuhi API copied into the Python
+# source set). kitawatch_server.py itself stays versioned.
+/app/src/main/python/api.py
+/app/src/main/python/src/
+/app/src/main/python/assets/

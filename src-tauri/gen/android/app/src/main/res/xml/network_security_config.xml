@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The bundled Python services (Kuhi API on 127.0.0.1:8000) speak plain HTTP on
+  loopback. Release builds set usesCleartextTraffic=false, which would block
+  them, so loopback is allowed explicitly here. Everything else stays
+  cleartext-blocked.
+-->
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
