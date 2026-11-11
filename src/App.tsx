@@ -289,7 +289,10 @@ export default function App() {
                     </button>
                   </div>
                 </div>
-                <Watch id={playerRoute.id} episode={playerRoute.episode} />
+                {/* compact: the popup shows the player only — the full
+                    Watch layout (episodes, sources, torrent, probes) is far
+                    too tall for the floating window. */}
+                <Watch id={playerRoute.id} episode={playerRoute.episode} compact={!isWatchRoute} />
               </div>
             </Suspense>
           )}

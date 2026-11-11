@@ -32,9 +32,14 @@ const sourceKey = (s: StreamSource) => `${s.server ?? 'src'}|${s.url}`;
 interface WatchProps {
   id: string;
   episode: string;
+  /** Popup/mini-player rendering: show ONLY the player. The episode grid,
+   *  torrent panel, provider probe and source list would otherwise fill the
+   *  small popup and push the video off-screen (user report: "die ganzen
+   *  Folgen unter dem stream ... nimmt zu viel platz weg"). */
+  compact?: boolean;
 }
 
-export default function Watch({ id, episode }: WatchProps) {
+export default function Watch({ id, episode, compact = false }: WatchProps) {
   const navigate = useNavigate();
   const epNum = Number(episode) || 1;
   const autoplayNext = useSettingsStore((s) => s.autoplayNext);
@@ -311,48 +316,50 @@ export default function Watch({ id, episode }: WatchProps) {
   };
 
   return (
-    <PageContainer className="!space-y-5">
-      <div className="flex items-center gap-4">
-        <Link
-          to={`/anime/${id}`}
-          className="flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Link>
-        {info.loading ? (
-          <Skeleton className="h-6 w-64" />
-        ) : (
-          <p className="min-w-0 truncate text-sm text-zinc-300">
-            {info.data ? (
-              <Link to={`/anime/${id}`} className="font-semibold text-white hover:underline">
-                {info.data.title}
-              </Link>
-            ) : (
-              <span className="font-semibold text-white">Unknown anime</span>
-            )}
-            <span className="mx-2 text-zinc-600">·</span>
-            Episode {epNum}
-            {episodeByNumber.get(epNum)?.title && (
-              <span className="text-zinc-400"> — {episodeByNumber.get(epNum)?.title}</span>
-            )}
-          </p>
-        )}
-        <div className="ml-auto flex shrink-0 items-center rounded-lg bg-ink-850 p-0.5 ring-1 ring-white/10">
-          {(['sub', 'dub'] as const).map((a) => (
-            <button
-              key={a}
-              onClick={() => setAudio(a)}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition ${
-                audio === a ? 'bg-accent-600 text-white' : 'text-zinc-400 hover:text-white'
-              }`}
-            >
-              {a === 'sub' ? 'Sub' : 'Dub'}
-            </button>
-          ))}
+    <PageContainer className={compact ? '!space-y-3 !p-3' : '!space-y-5'}>
+      {!compact && (
+        <div className="flex items-center gap-4">
+          <Link
+            to={`/anime/${id}`}
+            className="flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back
+          </Link>
+          {info.loading ? (
+            <Skeleton className="h-6 w-64" />
+          ) : (
+            <p className="min-w-0 truncate text-sm text-zinc-300">
+              {info.data ? (
+                <Link to={`/anime/${id}`} className="font-semibold text-white hover:underline">
+                  {info.data.title}
+                </Link>
+              ) : (
+                <span className="font-semibold text-white">Unknown anime</span>
+              )}
+              <span className="mx-2 text-zinc-600">·</span>
+              Episode {epNum}
+              {episodeByNumber.get(epNum)?.title && (
+                <span className="text-zinc-400"> — {episodeByNumber.get(epNum)?.title}</span>
+              )}
+            </p>
+          )}
+          <div className="ml-auto flex shrink-0 items-center rounded-lg bg-ink-850 p-0.5 ring-1 ring-white/10">
+            {(['sub', 'dub'] as const).map((a) => (
+              <button
+                key={a}
+                onClick={() => setAudio(a)}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition ${
+                  audio === a ? 'bg-accent-600 text-white' : 'text-zinc-400 hover:text-white'
+                }`}
+              >
+                {a === 'sub' ? 'Sub' : 'Dub'}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {info.data && <WatchStatusControl mediaId={Number(id)} />}
+      {!compact && info.data && <WatchStatusControl mediaId={Number(id)} />}
 
       {/* Player (HTTP sources first, torrent blob as last resort).
           Background merges re-trigger streams.reload() — with data already
@@ -422,8 +429,9 @@ export default function Watch({ id, episode }: WatchProps) {
 
       {/* Episode strip — jump between episodes without going back to the
           detail page. Only AIRED episodes are listed (see latestAired), and
-          long shows paginate in 100-episode blocks. */}
-      {episodeList.length > 0 && (
+          long shows paginate in 100-episode blocks. Hidden in the popup
+          mini-player (compact) — it drowned the video. */}
+      {!compact && episodeList.length > 0 && (
         <section className="rounded-2xl bg-ink-900 p-4 ring-1 ring-white/5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest text-zinc-500">
@@ -511,7 +519,7 @@ export default function Watch({ id, episode }: WatchProps) {
       )}
 
       {/* Torrent fallback — when nothing else worked */}
-      {info.data && (
+      {!compact && info.data && (
         <TorrentPanel
           animeTitle={info.data.title}
           onStream={(url, label) => {
@@ -521,7 +529,7 @@ export default function Watch({ id, episode }: WatchProps) {
       )}
 
       {/* Provider availability probe */}
-      {info.data && (
+      {!compact && info.data && (
         <ProviderCheck animeId={id!} title={info.data.title} episode={epNum} />
       )}
 
@@ -531,7 +539,7 @@ export default function Watch({ id, episode }: WatchProps) {
           never make the current stream vanish from the list. Stays mounted
           during background merges (streams.reload) — only the pill contents
           update. */}
-      {allSources.length > 0 && !torrent && (
+      {allSources.length > 0 && !torrent && !compact && (
         <section className="rounded-2xl bg-ink-900 p-4 ring-1 ring-white/5">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -565,28 +573,32 @@ export default function Watch({ id, episode }: WatchProps) {
         </section>
       )}
 
-      <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={epNum <= 1}
-          onClick={() => navigate(`/watch/${id}/${epNum - 1}`)}
-        >
-          <ChevronLeft className="h-4 w-4" /> Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          disabled={!hasNext}
-          onClick={() => navigate(`/watch/${id}/${epNum + 1}`)}
-        >
-          Next <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
+      {!compact && (
+        <>
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={epNum <= 1}
+              onClick={() => navigate(`/watch/${id}/${epNum - 1}`)}
+            >
+              <ChevronLeft className="h-4 w-4" /> Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={!hasNext}
+              onClick={() => navigate(`/watch/${id}/${epNum + 1}`)}
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
 
-      <div className="max-w-md">
-        <Disclaimer />
-      </div>
+          <div className="max-w-md">
+            <Disclaimer />
+          </div>
+        </>
+      )}
     </PageContainer>
   );
 }
