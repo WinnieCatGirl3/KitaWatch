@@ -518,11 +518,18 @@ export const api = {
     loadEpisodes(Number(id), Math.max(1, Number(episode) || 1)),
 
   // Streaming
+  // 30s, not the 12s default: Kuhi's internal provider race legitimately
+  // takes 9-20s on the phone (measured), so the old default aborted the
+  // ONE working provider right before it answered ("Request timed out").
   extract: (query: number | string, episode: number, audio: AudioType = 'sub') =>
-    request<ExtractResponse>(`/anime/extract/${encodeURIComponent(String(query))}`, {
-      e: episode,
-      type: audio,
-    }),
+    request<ExtractResponse>(
+      `/anime/extract/${encodeURIComponent(String(query))}`,
+      {
+        e: episode,
+        type: audio,
+      },
+      30_000,
+    ),
   providersStatus: () => request<ProviderStatus>('/anime/providers/status'),
 };
 
