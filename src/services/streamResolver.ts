@@ -12,8 +12,9 @@ import { useSettingsStore } from '@/stores/settingsStore';
 import type { AudioType, StreamSource, SubtitleTrack } from '@/types';
 
 // Session cache: skipping through a season must not re-fire every
-// backend per episode. 10-minute TTL.
-const streamCache = new Map<string, { at: number; value: ResolvedStreams }>();
+// backend per episode. 10-minute TTL for hits; failures get a short TTL
+// (see resolveStreams) so a cold-start miss doesn't stick.
+const streamCache = new Map<string, { at: number; value: ResolvedStreams; ttl: number }>();
 const CACHE_TTL_MS = 10 * 60_000;
 
 /** Fired (with the cache key as detail) when a background merge adds late
@@ -437,18 +438,31 @@ export async function resolveStreams(
   // never be served for an H title (and vice versa).
   const key = `${animeId}|${episode}|${audio}|${isAdult === true ? 'a' : 'n'}`;
   const hit = streamCache.get(key);
-  if (hit && Date.now() - hit.at < CACHE_TTL_MS) {
+  if (hit && Date.now() - hit.at < hit.ttl) {
     // Fresh wrapper so React sees new state on reload; the streams array may
     // have grown via a background merge since the last read.
     const v = hit.value;
     return {
       streams: [...v.streams],
       subtitles: v.subtitles,
-      errors: v.errors,
+      errors: [...v.errors],
       unavailable: v.unavailable,
     };
   }
-  const value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
-  streamCache.set(key, { at: Date.now(), value });
+  let value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
+  // Cold start: on Android the Python sidecars (Kuhi API + proxy) boot in a
+  // background thread while the UI already fires the resolver, so EVERY
+  // provider fails with connection errors on the first pass. One delayed
+  // re-run turns "no playable stream" into playback without a manual retry.
+  // Confident misses (unavailable) are not retried — nothing is booting there.
+  if (value.streams.length === 0 && !value.unavailable) {
+    await new Promise((r) => setTimeout(r, 2500));
+    value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
+  }
+  // Failures must NOT be cached for the full TTL: a cold-start miss would
+  // otherwise keep serving "Every source failed" for 10 minutes and the
+  // Retry button (which hits this cache) would do nothing until it expired.
+  const ttl = value.streams.length > 0 ? CACHE_TTL_MS : 30_000;
+  streamCache.set(key, { at: Date.now(), value, ttl });
   return value;
 }
