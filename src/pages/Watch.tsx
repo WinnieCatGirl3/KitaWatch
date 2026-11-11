@@ -322,6 +322,20 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
     );
   };
 
+  /** Loading state for the stream race: shows elapsed time and sets
+   *  expectations — Kuhi's provider race takes 9-20s on the phone, so a
+   *  bare spinner read as "stuck" (user report: streaming unreliable /
+   *  takes forever). Re-renders every second while visible. */
+  const [loadSeconds, setLoadSeconds] = useState(0);
+  useEffect(() => {
+    if (!(info.loading || (!infoLoaded && !info.error) || (streams.loading && allSources.length === 0))) {
+      setLoadSeconds(0);
+      return;
+    }
+    const t = setInterval(() => setLoadSeconds((s) => s + 1), 1000);
+    return () => clearInterval(t);
+  }, [info.loading, infoLoaded, info.error, streams.loading, allSources.length]);
+
   return (
     <PageContainer className={compact ? '!space-y-3 !p-3' : '!space-y-5'}>
       {!compact && (
@@ -374,13 +388,22 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
           (the "Anivexa erased my source" flash). Skeleton only pre-data. */}
       {info.loading || (!infoLoaded && !info.error) || (streams.loading && allSources.length === 0) ? (
         <div
-          className="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl bg-ink-900 text-zinc-400 ring-1 ring-white/5"
+          className="flex aspect-video flex-col items-center justify-center gap-3 rounded-2xl bg-ink-900 px-6 text-center text-zinc-400 ring-1 ring-white/5"
           role="status"
           aria-live="polite"
         >
           <LoaderCircle className="h-7 w-7 animate-spin text-accent-400" />
-          <p className="text-sm">Finding a playable stream…</p>
-          <p className="text-xs text-zinc-600">Checking available providers for episode {epNum}</p>
+          <p className="text-sm">
+            Finding a playable stream…
+            {loadSeconds > 0 && (
+              <span className="ml-1.5 tabular-nums text-zinc-500">{loadSeconds}s</span>
+            )}
+          </p>
+          <p className="text-xs text-zinc-600">
+            {loadSeconds < 8
+              ? `Checking Kuhi, AniKage and other providers for episode ${epNum}`
+              : 'The fastest provider is still scraping — this can take up to ~20s the first time'}
+          </p>
         </div>
       ) : info.error ? (
         <ErrorState
