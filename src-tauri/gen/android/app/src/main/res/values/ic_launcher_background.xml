@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Transparent: the official KitaWatch icon is a purple rounded square
+         with transparent corners. A solid (white) adaptive background would
+         paint those corners white behind the launcher mask. -->
+    <color name="ic_launcher_background">#00000000</color>
+</resources>
