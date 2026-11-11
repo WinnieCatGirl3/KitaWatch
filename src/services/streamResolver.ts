@@ -373,6 +373,14 @@ async function resolveStreamsInner(
   const pending = attempts.map((a, i) =>
     a.run()
       .then((result): TaggedResult => {
+        // A provider that "succeeds" with an empty list must never win
+        // Promise.any: 1anime resolves {streams: []} without throwing when
+        // all of its candidates fail, which used to end the race while the
+        // slow-but-working Kuhi request was still in flight — the page then
+        // showed "No playable stream found" with no Kuhi error in the list.
+        if (!result.streams.length) {
+          throw new Error(`${a.name}: no streams for this episode`);
+        }
         // Preserve provider-specific subtitle lists when present. Otherwise,
         // attach the provider-level list to its streams so switching sources
         // also switches the subtitles instead of keeping a stale global track.
