@@ -60,12 +60,15 @@ export default function TorrentPanel({ animeTitle, onStream }: Props) {
         may not. You upload data while watching.
       </p>
 
-      <div className="flex gap-2">
+      {/* flex-wrap + min-w-0: at 360px the input's intrinsic width plus the
+          two buttons exceeded the card and stretched the whole page into a
+          horizontal scroller (input never shrank below its default size). */}
+      <div className="flex flex-wrap items-center gap-2">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && search()}
-          className="flex-1 rounded-lg bg-ink-800 px-3 py-2 text-sm text-zinc-200 ring-1 ring-white/10 focus:outline-none focus:ring-2 focus:ring-accent-500/60"
+          className="min-w-0 flex-1 basis-40 rounded-lg bg-ink-800 px-3 py-2 text-sm text-zinc-200 ring-1 ring-white/10 focus:outline-none focus:ring-2 focus:ring-accent-500/60"
         />
         <Button variant="outline" size="sm" onClick={search} disabled={searching || !query.trim()}>
           {searching ? (
@@ -80,7 +83,7 @@ export default function TorrentPanel({ animeTitle, onStream }: Props) {
           target="_blank"
           rel="noreferrer"
           title="Open this search on nyaa.si in your browser"
-          className="flex items-center rounded-lg bg-ink-800 px-3 py-2 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
+          className="flex shrink-0 items-center rounded-lg bg-ink-800 px-3 py-2 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
         >
           <ExternalLink className="h-3.5 w-3.5" />
         </a>

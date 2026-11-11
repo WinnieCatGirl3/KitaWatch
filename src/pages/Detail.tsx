@@ -217,7 +217,7 @@ export default function Detail() {
         )}
       </div>
 
-      <div className="space-y-8 px-6 pb-6 pt-6">
+      <div className="space-y-8 px-4 pb-6 pt-6 sm:px-6">
         {/* Header: title and cover sit below the banner so neither can be obscured. */}
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
           {info.loading ? (

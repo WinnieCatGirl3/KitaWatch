@@ -16,7 +16,9 @@ import type { SpotlightAnime, AnimeSummary } from '@/types';
 function Hero({ anime }: { anime: SpotlightAnime }) {
   const navigate = useNavigate();
   return (
-    <div className="relative h-[420px] overflow-hidden rounded-2xl ring-1 ring-white/5">
+    // Responsive height/padding/type: at 360px the desktop-sized hero
+    // (420px tall, text-4xl, p-8) swallowed the whole first screen.
+    <div className="relative h-[300px] overflow-hidden rounded-2xl ring-1 ring-white/5 sm:h-[360px] md:h-[420px]">
       {anime.banner || anime.cover ? (
         <img
           src={anime.banner ?? anime.cover}
@@ -28,17 +30,17 @@ function Hero({ anime }: { anime: SpotlightAnime }) {
       )}
       <div className="absolute inset-0 bg-gradient-to-t from-ink-950 via-ink-950/40 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-r from-ink-950/80 via-transparent to-transparent" />
-      <div className="absolute bottom-0 left-0 max-w-2xl p-8">
+      <div className="absolute bottom-0 left-0 max-w-2xl p-4 sm:p-6 md:p-8">
         <Badge variant="accent">#1 Spotlight</Badge>
-        <h1 className="mt-3 text-4xl font-bold text-white drop-shadow-lg">
+        <h1 className="mt-3 text-xl font-bold leading-tight text-white drop-shadow-lg sm:text-2xl md:text-4xl">
           {anime.title}
         </h1>
         {anime.description && (
-          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-zinc-300">
+          <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-zinc-300 sm:line-clamp-3">
             {anime.description}
           </p>
         )}
-        <div className="mt-5 flex gap-3">
+        <div className="mt-4 flex gap-3 sm:mt-5">
           <Button onClick={() => navigate(`/watch/${anime.id}/1`)}>
             <Play className="h-4 w-4 fill-current" /> Watch Now
           </Button>
@@ -138,7 +140,7 @@ export default function Home() {
           onRetry={spotlight.reload}
         />
       ) : spotlight.loading ? (
-        <Skeleton className="h-[420px] rounded-2xl" />
+        <Skeleton className="h-[300px] rounded-2xl sm:h-[360px] md:h-[420px]" />
       ) : spotlight.data?.[0] ? (
         <Hero anime={spotlight.data[0]} />
       ) : null}
