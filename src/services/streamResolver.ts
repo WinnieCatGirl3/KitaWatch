@@ -41,6 +41,14 @@ export interface ResolvedStreams {
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
+/** In-flight dedupe: every resolveStreams call for the same key shares ONE
+ *  race. Without this, each late background merge fires streamUpdates ->
+ *  Watch.reload() -> resolveStreams -> ANOTHER full provider race, whose
+ *  winner differs again -> another update ... (measured: 30 resolver starts
+ *  within 430ms on the phone — the flood made every provider slower and
+ *  tripped AniKage's rate limiter). */
+const inflight = new Map<string, Promise<ResolvedStreams>>();
+
 /** Title-verification context for the current resolve: all AniList title
  *  variants plus airing status, read from the ALREADY-FETCHED cached info —
  *  zero extra requests, zero rate-limit exposure. */
@@ -449,20 +457,30 @@ export async function resolveStreams(
       unavailable: v.unavailable,
     };
   }
-  let value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
-  // Cold start: on Android the Python sidecars (Kuhi API + proxy) boot in a
-  // background thread while the UI already fires the resolver, so EVERY
-  // provider fails with connection errors on the first pass. One delayed
-  // re-run turns "no playable stream" into playback without a manual retry.
-  // Confident misses (unavailable) are not retried — nothing is booting there.
-  if (value.streams.length === 0 && !value.unavailable) {
-    await new Promise((r) => setTimeout(r, 2500));
-    value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
-  }
-  // Failures must NOT be cached for the full TTL: a cold-start miss would
-  // otherwise keep serving "Every source failed" for 10 minutes and the
-  // Retry button (which hits this cache) would do nothing until it expired.
-  const ttl = value.streams.length > 0 ? CACHE_TTL_MS : 30_000;
-  streamCache.set(key, { at: Date.now(), value, ttl });
-  return value;
+  // Share one race per key (see inflight): a reload fired while the first
+  // call is still resolving must piggyback on it, not start a second one.
+  const running = inflight.get(key);
+  if (running) return running;
+  const run = (async () => {
+    let value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
+    // Cold start: on Android the Python sidecars (Kuhi API + proxy) boot in a
+    // background thread while the UI already fires the resolver, so EVERY
+    // provider fails with connection errors on the first pass. One delayed
+    // re-run turns "no playable stream" into playback without a manual retry.
+    // Confident misses (unavailable) are not retried — nothing is booting there.
+    if (value.streams.length === 0 && !value.unavailable) {
+      await new Promise((r) => setTimeout(r, 2500));
+      value = await resolveStreamsInner(animeId, episode, audio, title, isAdult);
+    }
+    // Failures must NOT be cached for the full TTL: a cold-start miss would
+    // otherwise keep serving "Every source failed" for 10 minutes and the
+    // Retry button (which hits this cache) would do nothing until it expired.
+    const ttl = value.streams.length > 0 ? CACHE_TTL_MS : 30_000;
+    streamCache.set(key, { at: Date.now(), value, ttl });
+    return value;
+  })().finally(() => {
+    inflight.delete(key);
+  });
+  inflight.set(key, run);
+  return run;
 }

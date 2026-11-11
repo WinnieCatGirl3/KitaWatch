@@ -141,16 +141,23 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
 
   // Late providers merge into the result in the background — reload on their
   // update event so the Sources list grows without a manual refresh.
+  // Debounced: a burst of merge/probe updates must coalesce into ONE reload
+  // (each reload re-invokes the resolver and re-renders the whole page).
   const reloadRef = useRef(streams.reload);
   reloadRef.current = streams.reload;
   useEffect(() => {
+    let t: ReturnType<typeof setTimeout> | undefined;
     const onUpdate = (e: Event) => {
       if ((e as CustomEvent<string>).detail === `${id}|${epNum}|${audio}`) {
-        reloadRef.current();
+        clearTimeout(t);
+        t = setTimeout(() => reloadRef.current(), 400);
       }
     };
     streamUpdates.addEventListener('update', onUpdate);
-    return () => streamUpdates.removeEventListener('update', onUpdate);
+    return () => {
+      clearTimeout(t);
+      streamUpdates.removeEventListener('update', onUpdate);
+    };
   }, [id, epNum, audio]);
 
   const [torrent, setTorrent] = useState<{ url: string; label: string } | null>(null);
