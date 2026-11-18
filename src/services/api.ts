@@ -318,7 +318,10 @@ const jikanEpisodePageCache = new Map<string, Promise<EpisodeSummary[]>>();
 function providerEpisodesFor(id: number): Promise<EpisodeSummary[]> {
   const cached = providerEpisodeCache.get(id);
   if (cached) return cached;
-  const pending = request<unknown>(`/anime/episodes/${id}`)
+  // 30s, not the 12s default: the server merges episode lists from up to 12
+  // providers and legitimately needs up to ~20s (measured 33s before the
+  // merge got a deadline), so the old default always aborted it.
+  const pending = request<unknown>(`/anime/episodes/${id}`, undefined, 30_000)
     .then(adaptEpisodes)
     .catch((error) => {
       providerEpisodeCache.delete(id);
