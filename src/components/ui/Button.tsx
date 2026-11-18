@@ -11,10 +11,10 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  // py-2 (not py-1.5): "sm" buttons are the primary touch targets on phones
+  // py-2.5 (not py-1.5): "sm" buttons are the primary touch targets on phones
   // (Previous/Next, Retry, Load more) and measured only ~28px tall at 12px
   // text — below the ~36px minimum for comfortable tapping.
-  sm: 'px-3 py-2 text-xs',
+  sm: 'px-3 py-2.5 text-xs',
   md: 'px-4 py-2 text-sm',
 };
 

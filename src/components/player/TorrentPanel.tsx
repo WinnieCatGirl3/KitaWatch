@@ -50,7 +50,7 @@ export default function TorrentPanel({ animeTitle, onStream }: Props) {
         <Magnet className="h-4 w-4 text-accent-400" />
         <h2 className="text-sm font-semibold text-white">
           Torrent fallback{' '}
-          <span className="text-[10px] font-normal uppercase tracking-widest text-zinc-500">
+          <span className="text-[11px] font-normal uppercase tracking-widest text-zinc-500">
             experimental
           </span>
         </h2>
@@ -83,7 +83,7 @@ export default function TorrentPanel({ animeTitle, onStream }: Props) {
           target="_blank"
           rel="noreferrer"
           title="Open this search on nyaa.si in your browser"
-          className="flex shrink-0 items-center rounded-lg bg-ink-800 px-3 py-2 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
+          className="flex h-9 shrink-0 items-center justify-center rounded-lg bg-ink-800 px-3 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
         >
           <ExternalLink className="h-3.5 w-3.5" />
         </a>

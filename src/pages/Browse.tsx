@@ -125,7 +125,7 @@ export default function Browse() {
                 <button
                   key={s.key}
                   onClick={() => updateParams({ sort: s.key === 'trending' ? null : s.key })}
-                  className={`rounded-md px-3 py-2 text-xs font-medium capitalize transition ${
+                  className={`rounded-md px-3 py-2.5 text-xs font-medium capitalize transition ${
                     sort === s.key
                       ? 'bg-accent-600 text-white'
                       : 'text-zinc-400 hover:text-zinc-100'

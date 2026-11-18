@@ -369,7 +369,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
               <button
                 key={a}
                 onClick={() => setAudio(a)}
-                className={`rounded-md px-4 py-2 text-xs font-medium transition ${
+                className={`rounded-md px-4 py-2.5 text-xs font-medium transition ${
                   audio === a ? 'bg-accent-600 text-white' : 'text-zinc-400 hover:text-white'
                 }`}
               >

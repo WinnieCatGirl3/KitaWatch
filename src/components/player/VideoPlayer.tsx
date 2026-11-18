@@ -902,7 +902,7 @@ function MediaPlayer({
             type="button"
             onClick={() => void downloadEpisode()}
             disabled={downloadState.busy}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent-600 px-3 py-2 text-xs font-medium text-white transition hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent-600 px-3 py-2.5 text-xs font-medium text-white transition hover:bg-accent-500 disabled:cursor-not-allowed disabled:opacity-60"
             title="Save this direct MP4 file for offline playback"
           >
             <Download className="h-3.5 w-3.5" />

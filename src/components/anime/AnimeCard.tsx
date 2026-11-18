@@ -81,7 +81,7 @@ function AnimeCard({ anime, index = 0, href, badge, onRemove }: Props) {
             event.stopPropagation();
             onRemove();
           }}
-          className="absolute right-2 top-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/75 text-white shadow transition hover:bg-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
+          className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/75 text-white shadow transition hover:bg-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400"
         >
           <X className="h-4 w-4" aria-hidden="true" />
         </button>

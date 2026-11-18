@@ -19,7 +19,7 @@ interface Props {
 export default function Badge({ variant = 'neutral', children, className = '' }: Props) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${styles[variant]} ${className}`}
+      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-semibold uppercase tracking-wide ${styles[variant]} ${className}`}
     >
       {children}
     </span>

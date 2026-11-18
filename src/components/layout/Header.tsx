@@ -159,7 +159,7 @@ export default function Header() {
               if (!location.pathname.startsWith('/watch/')) navigate('/browse');
             }}
             aria-label="Clear search"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-zinc-500 hover:text-zinc-200"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-2 text-zinc-500 hover:text-zinc-200"
           >
             <X className="h-3.5 w-3.5" />
           </button>
@@ -236,7 +236,7 @@ export default function Header() {
           <button
             onClick={() => setNotifOpen((v) => !v)}
             title="Notifications"
-            className={`relative flex h-8 w-8 items-center justify-center rounded-full transition ${
+            className={`relative flex h-9 w-9 items-center justify-center rounded-full transition ${
               notifOpen
                 ? 'bg-ink-850 text-accent-400'
                 : 'text-zinc-400 hover:bg-ink-850 hover:text-accent-400'
@@ -445,9 +445,9 @@ export default function Header() {
           <Link
             to="/settings"
             title="Login with AniList"
-            className="flex items-center gap-2 rounded-full bg-ink-850 px-3 py-1.5 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
+            className="flex items-center gap-2 rounded-full bg-ink-850 px-3 py-2.5 text-xs text-zinc-300 ring-1 ring-white/10 transition hover:text-white hover:ring-accent-500/50"
           >
-            <UserRound className="h-3.5 w-3.5 text-accent-400" />
+            <UserRound className="h-4 w-4 text-accent-400" />
             <span className="hidden whitespace-nowrap sm:inline">Login with AniList</span>
           </Link>
         )}
