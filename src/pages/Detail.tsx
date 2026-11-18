@@ -344,12 +344,12 @@ export default function Detail() {
                       </div>
                     )}
                   </div>
-                  <div className="p-2.5">
-                    <p className="text-xs font-semibold text-zinc-200">
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-zinc-200">
                       Episode {ep.number}
                     </p>
                     {ep.title && (
-                      <p className="mt-0.5 line-clamp-1 text-[11px] text-zinc-500">
+                      <p className="mt-0.5 line-clamp-1 text-xs text-zinc-500">
                         {ep.title}
                       </p>
                     )}

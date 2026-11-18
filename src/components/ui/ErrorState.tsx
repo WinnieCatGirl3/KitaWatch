@@ -16,8 +16,8 @@ export default function ErrorState({
   onRetry,
 }: Props) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-ink-900 p-10 text-center ring-1 ring-white/5">
-      <WifiOff className="h-10 w-10 text-zinc-600" />
+    <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-ink-900 p-6 text-center ring-1 ring-white/5 sm:p-10">
+      <WifiOff className="h-9 w-9 text-zinc-600 sm:h-10 sm:w-10" />
       <p className="font-semibold text-zinc-200">{title}</p>
       {message && <p className="max-w-sm text-sm text-zinc-500">{message}</p>}
       {details && details.length > 0 && (
@@ -30,8 +30,8 @@ export default function ErrorState({
         </div>
       )}
       {onRetry && (
-        <Button variant="outline" size="sm" onClick={onRetry}>
-          <RotateCcw className="h-3.5 w-3.5" /> Retry
+        <Button variant="outline" size="md" onClick={onRetry}>
+          <RotateCcw className="h-4 w-4" /> Retry
         </Button>
       )}
     </div>

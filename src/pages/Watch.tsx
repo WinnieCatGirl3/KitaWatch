@@ -268,7 +268,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
           onClick={() => !isDeadPill && setActiveKey(key)}
           disabled={isDeadPill}
           title={isDeadPill ? 'Unresponsive' : undefined}
-          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs ring-1 transition ${
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-2.5 text-xs ring-1 transition ${
             isDeadPill
               ? 'cursor-not-allowed bg-ink-900 text-zinc-600 ring-white/5 line-through'
               : isActive
@@ -309,7 +309,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
                 ? `Remove preferred ${audio.toUpperCase()} provider: ${s.server}`
                 : `Remember ${s.server} for ${audio.toUpperCase()}`
             }
-            className={`rounded-full px-2 py-1.5 text-[10px] ring-1 transition ${
+            className={`rounded-full px-3 py-2.5 text-[11px] ring-1 transition ${
               isPreferred
                 ? 'bg-accent-600/20 text-accent-300 ring-accent-500/40'
                 : 'bg-ink-850 text-zinc-500 ring-white/10 hover:text-zinc-100'
@@ -339,10 +339,10 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
   return (
     <PageContainer className={compact ? '!space-y-3 !p-3' : '!space-y-5'}>
       {!compact && (
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <Link
             to={`/anime/${id}`}
-            className="flex items-center gap-1.5 text-sm text-zinc-400 transition hover:text-white"
+            className="-ml-2 flex items-center gap-1.5 rounded-lg px-2 py-2 text-sm text-zinc-400 transition hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" /> Back
           </Link>
@@ -369,7 +369,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
               <button
                 key={a}
                 onClick={() => setAudio(a)}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition ${
+                className={`rounded-md px-4 py-2 text-xs font-medium transition ${
                   audio === a ? 'bg-accent-600 text-white' : 'text-zinc-400 hover:text-white'
                 }`}
               >
@@ -480,7 +480,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
                     <button
                       key={b}
                       onClick={() => setEpBlock(b)}
-                      className={`rounded-md px-2 py-1 text-xs ring-1 transition ${
+                      className={`rounded-md px-3 py-2 text-xs ring-1 transition ${
                         active
                           ? 'bg-accent-600/20 font-semibold text-accent-300 ring-accent-500/50'
                           : 'bg-ink-850 text-zinc-400 ring-white/10 hover:text-zinc-100'
@@ -608,7 +608,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               disabled={epNum <= 1}
               onClick={() => navigate(`/watch/${id}/${epNum - 1}`)}
             >
@@ -616,7 +616,7 @@ export default function Watch({ id, episode, compact = false }: WatchProps) {
             </Button>
             <Button
               variant="outline"
-              size="sm"
+              size="md"
               disabled={!hasNext}
               onClick={() => navigate(`/watch/${id}/${epNum + 1}`)}
             >

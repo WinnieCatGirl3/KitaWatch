@@ -134,7 +134,7 @@ export default function Header() {
   };
 
   return (
-    <header className="z-20 flex h-16 shrink-0 items-center gap-4 border-b border-white/5 bg-ink-950/80 px-6 backdrop-blur">
+    <header className="z-20 flex h-16 shrink-0 items-center gap-2 border-b border-white/5 bg-ink-950/80 px-3 backdrop-blur sm:gap-4 sm:px-6">
       <div ref={wrapRef} className="relative w-full max-w-md">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
         <input
@@ -159,7 +159,7 @@ export default function Header() {
               if (!location.pathname.startsWith('/watch/')) navigate('/browse');
             }}
             aria-label="Clear search"
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1 text-zinc-500 hover:text-zinc-200"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-zinc-500 hover:text-zinc-200"
           >
             <X className="h-3.5 w-3.5" />
           </button>

@@ -208,15 +208,15 @@ function EmbedPlayer({ source, onFatal }: Pick<Props, 'source' | 'onFatal'>) {
           {loaded ? 'Embedded player' : 'Loading embedded player'} ﾂｷ {host}. Blank? The provider may
           block embedding.
         </span>
-        <span className="flex gap-3">
+        <span className="flex gap-1">
           <button
             type="button"
-            className="text-zinc-300 hover:text-white"
+            className="rounded-lg px-2.5 py-2 text-zinc-300 hover:text-white"
             onClick={() => void openExternal(source.url)}
           >
             Open in browser
           </button>
-          <button type="button" className="text-zinc-300 hover:text-white" onClick={onFatal}>
+          <button type="button" className="rounded-lg px-2.5 py-2 text-zinc-300 hover:text-white" onClick={onFatal}>
             Try another source
           </button>
         </span>
@@ -870,7 +870,7 @@ function MediaPlayer({
       const btn = document.createElement('button');
       btn.textContent = spec.label;
       btn.className =
-        'absolute bottom-24 right-4 z-40 rounded-lg bg-black/70 px-3 py-1.5 text-sm text-white hover:bg-black/90';
+        'absolute bottom-24 right-4 z-40 rounded-lg bg-black/70 px-4 py-2.5 text-sm text-white hover:bg-black/90';
       btn.style.display = 'none';
       btn.onclick = () => {
         art.currentTime = interval.end;
@@ -930,7 +930,7 @@ function MediaPlayer({
                 <select
                   value={selectedSubtitleIndex}
                   onChange={(event) => { setSelectedSubtitleIndex(Number(event.target.value)); setSubtitleNotice(''); }}
-                  className="w-full rounded-md bg-zinc-800 px-2 py-2 text-white"
+                  className="w-full rounded-md bg-zinc-800 px-3 py-2.5 text-white"
                 >
                   {subtitles.map((track, index) => (
                     <option key={`${track.url}-${index}`} value={index}>
@@ -945,11 +945,11 @@ function MediaPlayer({
               </label>
               <label className="flex items-center justify-between gap-3">
                 <span>Text color</span>
-                <input aria-label="Subtitle text color" type="color" value={subtitleColor} onChange={(event) => setSubtitleColor(event.target.value)} className="h-8 w-10 cursor-pointer rounded bg-zinc-800 p-0.5" />
+                <input aria-label="Subtitle text color" type="color" value={subtitleColor} onChange={(event) => setSubtitleColor(event.target.value)} className="h-10 w-12 cursor-pointer rounded bg-zinc-800 p-0.5" />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-zinc-300">Font</span>
-                <select value={subtitleFontFamily} onChange={(event) => setSubtitleFontFamily(event.target.value)} className="w-full rounded-md bg-zinc-800 px-2 py-2 text-white">
+                <select value={subtitleFontFamily} onChange={(event) => setSubtitleFontFamily(event.target.value)} className="w-full rounded-md bg-zinc-800 px-3 py-2.5 text-white">
                   <option value="Arial, sans-serif">Arial</option>
                   <option value="Verdana, sans-serif">Verdana</option>
                   <option value="Tahoma, sans-serif">Tahoma</option>

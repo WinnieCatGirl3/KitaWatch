@@ -113,3 +113,22 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* --- Phone-sized player controls ---------------------------------------
+ * ArtPlayer injects its own stylesheet at runtime with `--art-*` defaults
+ * aimed at desktop (36px icons, 6px progress bar). On a 360px screen those
+ * controls are too small to hit reliably while holding the phone.
+ * The selector is doubled (`.art-video-player.art-video-player`) so it beats
+ * ArtPlayer's runtime-injected `.art-video-player` rule no matter which one
+ * loads last. */
+@media (max-width: 767px) {
+  .art-video-player.art-video-player {
+    --art-control-height: 56px;
+    --art-control-icon-size: 40px;
+    --art-progress-height: 10px;
+    --art-settings-icon-size: 28px;
+    --art-padding: 14px;
+    --art-state-size: 88px;
+    --art-subtitle-font-size: 15px;
+  }
+}

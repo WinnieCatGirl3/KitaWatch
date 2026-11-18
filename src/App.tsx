@@ -274,7 +274,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => navigate(`/watch/${playerRoute.id}/${playerRoute.episode}`)}
-                      className="rounded-md bg-accent-600 px-2 py-1 text-xs font-medium text-white hover:bg-accent-500"
+                      className="rounded-md bg-accent-600 px-3 py-2 text-xs font-medium text-white hover:bg-accent-500"
                     >
                       Open
                     </button>
@@ -283,7 +283,7 @@ export default function App() {
                       onClick={() => setPlayerDismissed(true)}
                       aria-label="Close mini-player and stop playback"
                       title="Close mini-player and stop playback"
-                      className="rounded-md px-2 py-1 text-xs text-zinc-400 hover:bg-white/10 hover:text-white"
+                      className="rounded-md p-2.5 text-zinc-400 hover:bg-white/10 hover:text-white"
                     >
                       <X className="h-4 w-4" />
                     </button>

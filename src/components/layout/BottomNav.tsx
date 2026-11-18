@@ -24,7 +24,7 @@ export default function BottomNav() {
             key={label}
             to={to}
             aria-current={active ? 'page' : undefined}
-            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition ${
+            className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-2.5 text-[11px] font-medium transition ${
               active
                 ? 'text-accent-300'
                 : 'text-zinc-400 active:text-zinc-100'
